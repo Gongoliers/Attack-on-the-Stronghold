@@ -17,7 +17,7 @@ public class Game {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        JFrame frame = new JFrame("Game Pieces vs Robots");
+        JFrame frame = new JFrame("Game Pieces vs Robots 0.0.1");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setResizable(false);
         GamePanel gp = new GamePanel();
