@@ -5,7 +5,7 @@
  */
 package com.kylecorry.sprites;
 
-import com.kylecorry.gpvr.ImageLoader;
+import com.kylecorry.attackstronghold.ImageLoader;
 
 /**
  *

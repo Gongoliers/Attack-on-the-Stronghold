@@ -5,8 +5,8 @@
  */
 package com.kylecorry.sprites;
 
-import com.kylecorry.gpvr.GamePanel;
-import com.kylecorry.gpvr.ImageLoader;
+import com.kylecorry.attackstronghold.GamePanel;
+import com.kylecorry.attackstronghold.ImageLoader;
 import java.awt.Graphics;
 import java.awt.Polygon;
 import java.awt.image.BufferedImage;
