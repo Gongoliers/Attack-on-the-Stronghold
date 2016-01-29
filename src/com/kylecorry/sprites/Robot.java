@@ -42,6 +42,10 @@ public class Robot implements Sprite {
         stopped = false;
     }
 
+    public GamePanel.SpriteType getType() {
+        return GamePanel.SpriteType.ROBOT;
+    }
+
     public void stop() {
         stopped = true;
     }
@@ -52,6 +56,10 @@ public class Robot implements Sprite {
 
     public void damage() {
         health--;
+    }
+
+    public void damage(int damage) {
+        health -= damage;
     }
 
     public void collision(Sprite s) {

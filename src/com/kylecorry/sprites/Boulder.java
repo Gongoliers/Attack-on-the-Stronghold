@@ -6,6 +6,7 @@
 package com.kylecorry.sprites;
 
 import com.kylecorry.gpvr.GamePanel;
+import static com.kylecorry.gpvr.GamePanel.SpriteType.BOULDER;
 import com.kylecorry.gpvr.ImageLoader;
 import java.awt.Graphics;
 import java.awt.Polygon;
@@ -28,6 +29,9 @@ public class Boulder implements Sprite {
     private int keyframe;
     private int counter;
     private int direction;
+    public final GamePanel.SpriteType TYPE = BOULDER;
+    private long lastFire = 0;
+    public static final long FIRE_TIMEOUT = 1500;
 
     public Boulder(int x, int y) {
         images = ImageLoader.getBoulder();
@@ -39,14 +43,31 @@ public class Boulder implements Sprite {
         counter = 0;
         direction = -1;
     }
-    
-    public boolean isAlive(){
+
+    public GamePanel.SpriteType getType() {
+        return GamePanel.SpriteType.BOULDER;
+    }
+
+    public boolean isAlive() {
         return health > 0;
     }
-    
-    public void collision(Sprite s){
+
+    public void collision(Sprite s) {
         health--;
         ((Robot) s).damage();
+    }
+
+    public boolean canFire() {
+        long currentTime = System.currentTimeMillis();
+        boolean canFire = (currentTime - lastFire) >= FIRE_TIMEOUT;
+        if (canFire) {
+            lastFire = currentTime;
+        }
+        return canFire;
+    }
+
+    public Projectile fire() {
+        return new BoulderProjectile(x + WIDTH / 2, y);
     }
 
     public void update() {

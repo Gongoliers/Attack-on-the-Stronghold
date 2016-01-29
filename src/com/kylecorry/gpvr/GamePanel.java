@@ -35,7 +35,8 @@ public class GamePanel extends JPanel {
     private SpriteType currentSpriteType;
 
     private Sprite[][] sprites;
-    private ArrayList<Robot> robots;
+    private ArrayList<Robot> robots, robotRemoveList;
+    private ArrayList<Projectile> projectiles, projectileRemoveList;
 
     private Random random;
 
@@ -48,7 +49,9 @@ public class GamePanel extends JPanel {
     public static enum SpriteType {
         BIN,
         TOTE,
-        BOULDER
+        BOULDER,
+        ROBOT,
+        PROJECTILE
     };
 
     public GamePanel() {
@@ -59,26 +62,34 @@ public class GamePanel extends JPanel {
         sprites = new Sprite[HEIGHT / TILE_HEIGHT][WIDTH / TILE_WIDTH];
         currentSpriteType = SpriteType.TOTE;
         robots = new ArrayList<>();
+        projectiles = new ArrayList<>();
+        projectileRemoveList = new ArrayList<>();
+        robotRemoveList = new ArrayList<>();
         random = new Random();
         addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent me) {
+
                 int x = GameMath.toGrid(me.getX(), TILE_WIDTH);
                 int y = GameMath.toGrid(me.getY(), TILE_HEIGHT);
                 int col = x / TILE_WIDTH;
                 int row = y / TILE_HEIGHT;
-                if (sprites[row][col] == null) {
-                    switch (currentSpriteType) {
-                        case TOTE:
-                            sprites[row][col] = new Tote(x, y);
-                            break;
-                        case BIN:
-                            sprites[row][col] = new Bin(x, y);
-                            break;
-                        case BOULDER:
-                            sprites[row][col] = new Boulder(x, y);
-                            break;
+                if (me.getButton() == MouseEvent.BUTTON1) {
+                    if (sprites[row][col] == null) {
+                        switch (currentSpriteType) {
+                            case TOTE:
+                                sprites[row][col] = new Tote(x, y);
+                                break;
+                            case BIN:
+                                sprites[row][col] = new Bin(x, y);
+                                break;
+                            case BOULDER:
+                                sprites[row][col] = new Boulder(x, y);
+                                break;
+                        }
                     }
+                } else if (me.getButton() == MouseEvent.BUTTON3) {
+                    sprites[row][col] = null;
                 }
             }
 
@@ -118,6 +129,7 @@ public class GamePanel extends JPanel {
                     case 51:
                         currentSpriteType = SpriteType.BOULDER;
                         break;
+
                 }
             }
 
@@ -171,6 +183,10 @@ public class GamePanel extends JPanel {
         for (int i = 0; i < robots.size(); i++) {
             Robot robot = robots.get(i);
             robot.update();
+            if (!robot.isAlive()) {
+                robotRemoveList.add(robot);
+                break;
+            }
             robot.draw(g);
             int x = GameMath.toGrid(robot.getX(), TILE_WIDTH) / TILE_WIDTH;
             int y = GameMath.toGrid(robot.getY(), TILE_HEIGHT) / TILE_WIDTH;
@@ -180,13 +196,39 @@ public class GamePanel extends JPanel {
             } else {
                 robot.move();
             }
-        }
-        for (int i = 0; i < robots.size(); i++) {
-            Robot robot = robots.get(i);
-            if (!robot.isAlive()) {
-                robots.remove(i);
+            for (int s = 0; s < x; s++) {
+                if (sprites[y][s] != null && sprites[y][s].getType() == SpriteType.BOULDER) {
+                    if (((Boulder) sprites[y][s]).canFire()) {
+                        projectiles.add(((Boulder) sprites[y][s]).fire());
+                    }
+                }
             }
         }
+        for (int i = 0; i < projectiles.size(); i++) {
+            Projectile projectile = projectiles.get(i);
+            projectile.update();
+            if (!projectile.isAlive()) {
+                projectileRemoveList.add(projectile);
+                break;
+            }
+            projectile.draw(g);
+            int x = GameMath.toGrid(projectile.getX(), TILE_WIDTH) / TILE_WIDTH;
+            int y = GameMath.toGrid(projectile.getY(), TILE_HEIGHT) / TILE_WIDTH;
+            for (Robot r : robots) {
+                if (GameMath.toGrid(r.getX(), TILE_WIDTH) / TILE_WIDTH == x && GameMath.toGrid(r.getY(), TILE_HEIGHT) / TILE_WIDTH == y) {
+                    projectile.collision(r);
+                }
+            }
+        }
+        for (Projectile p : projectileRemoveList) {
+            projectiles.remove(p);
+        }
+        projectileRemoveList.clear();
+
+        for (Robot r : robotRemoveList) {
+            robots.remove(r);
+        }
+        robotRemoveList.clear();
     }
 
 }

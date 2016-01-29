@@ -6,7 +6,6 @@
 package com.kylecorry.sprites;
 
 import com.kylecorry.gpvr.GamePanel;
-import static com.kylecorry.gpvr.GamePanel.SpriteType.TOTE;
 import com.kylecorry.gpvr.ImageLoader;
 import java.awt.Graphics;
 import java.awt.Polygon;
@@ -16,40 +15,39 @@ import java.awt.image.BufferedImage;
  *
  * @author kyle
  */
-public class Tote implements Sprite {
+public class Projectile implements Sprite {
 
     public static final int WIDTH = GamePanel.TILE_WIDTH;
     public static final int HEIGHT = GamePanel.TILE_HEIGHT;
-    public static final int TOP_HEALTH = 500;
-    private final int x;
+    public static final int TOP_HEALTH = 1;
+    private int x;
     private final int y;
-    private final BufferedImage image;
+    BufferedImage image;
     private int health;
-    private boolean alive;
+    public int damage = 25;
 
-    public final GamePanel.SpriteType TYPE = TOTE;
-
-    public Tote(int x, int y) {
-        image = ImageLoader.getTote();
+    public Projectile(int x, int y) {
+        image = ImageLoader.getBin();
         health = TOP_HEALTH;
         this.x = x;
         this.y = y;
-        alive = true;
-    }
-    
-    public GamePanel.SpriteType getType(){
-        return GamePanel.SpriteType.TOTE;
     }
 
     public void collision(Sprite s) {
-        health--;
+        health = 0;
+        ((Robot) s).damage(damage);
     }
 
     public boolean isAlive() {
-        return health > 0;
+        return health > 0 && x < GamePanel.WIDTH;
+    }
+    
+    public GamePanel.SpriteType getType(){
+        return GamePanel.SpriteType.PROJECTILE;
     }
 
     public void update() {
+        x+=10;
     }
 
     public int getX() {
@@ -67,8 +65,6 @@ public class Tote implements Sprite {
     }
 
     public void draw(Graphics g) {
-        if (alive) {
-            g.drawImage(image, x, y, null);
-        }
+        g.drawImage(image, x, y, null);
     }
 }

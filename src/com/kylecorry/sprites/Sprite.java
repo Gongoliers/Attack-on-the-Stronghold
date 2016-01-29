@@ -5,6 +5,7 @@
  */
 package com.kylecorry.sprites;
 
+import com.kylecorry.gpvr.GamePanel;
 import java.awt.Graphics;
 import java.awt.Polygon;
 
@@ -20,4 +21,5 @@ public interface Sprite {
     public abstract int getY();
     public abstract boolean isAlive();
     public abstract void collision(Sprite s);
+    public abstract GamePanel.SpriteType getType();
 }

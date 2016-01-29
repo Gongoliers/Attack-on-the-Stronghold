@@ -31,6 +31,10 @@ public class Bin implements Sprite {
         this.x = x;
         this.y = y;
     }
+    
+    public GamePanel.SpriteType getType(){
+        return GamePanel.SpriteType.BIN;
+    }
 
     public void collision(Sprite s) {
         health--;
