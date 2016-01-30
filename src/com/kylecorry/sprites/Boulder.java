@@ -16,7 +16,7 @@ import java.awt.image.BufferedImage;
  *
  * @author kyle
  */
-public class Boulder implements Sprite {
+public class Boulder implements Sprite, Shooter{
 
     public static final int WIDTH = GamePanel.TILE_WIDTH;
     public static final int HEIGHT = GamePanel.TILE_HEIGHT;
@@ -31,7 +31,6 @@ public class Boulder implements Sprite {
     private int direction;
     public final GamePanel.SpriteType TYPE = BOULDER;
     private long lastFire = 0;
-    public static final long FIRE_TIMEOUT = 1500;
 
     public Boulder(int x, int y) {
         images = ImageLoader.getBoulder();
@@ -48,28 +47,33 @@ public class Boulder implements Sprite {
         return GamePanel.SpriteType.BOULDER;
     }
 
+    @Override
     public boolean isAlive() {
         return health > 0;
     }
 
+    @Override
     public void collision(Sprite s) {
         health--;
         ((Robot) s).damage();
     }
 
+    @Override
     public boolean canFire() {
         long currentTime = System.currentTimeMillis();
-        boolean canFire = (currentTime - lastFire) >= FIRE_TIMEOUT;
+        boolean canFire = (currentTime - lastFire) >= getTimeout();
         if (canFire) {
             lastFire = currentTime;
         }
         return canFire;
     }
 
+    @Override
     public Projectile fire() {
         return new BoulderProjectile(x + WIDTH / 2, y);
     }
 
+    @Override
     public void update() {
         if (counter == 2) {
             if (keyframe == 0) {
@@ -102,5 +106,10 @@ public class Boulder implements Sprite {
         if (alive) {
             g.drawImage(images[keyframe], x, y, null);
         }
+    }
+
+    @Override
+    public long getTimeout() {
+        return 1500;
     }
 }

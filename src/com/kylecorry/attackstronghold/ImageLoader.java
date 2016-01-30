@@ -27,6 +27,16 @@ public class ImageLoader {
         }
         return null;
     }
+    
+    public static BufferedImage getNoodle() {
+        try {
+            return ImageIO.read(ResourceLoader.load("noodle.png"));
+        } catch (IOException ex) {
+            Logger.getLogger(ImageLoader.class.getName()).log(Level.SEVERE, null, ex);
+            System.exit(1);
+        }
+        return null;
+    }
 
     public static BufferedImage[] getBoulder() {
         BufferedImage[] images = new BufferedImage[5];

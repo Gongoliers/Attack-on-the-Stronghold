@@ -197,9 +197,9 @@ public class GamePanel extends JPanel {
                 robot.move();
             }
             for (int s = 0; s < x; s++) {
-                if (sprites[y][s] != null && sprites[y][s].getType() == SpriteType.BOULDER) {
-                    if (((Boulder) sprites[y][s]).canFire()) {
-                        projectiles.add(((Boulder) sprites[y][s]).fire());
+                if (sprites[y][s] != null && (sprites[y][s].getType() == SpriteType.BOULDER || sprites[y][s].getType() == SpriteType.BIN)) {
+                    if (((Shooter) sprites[y][s]).canFire()) {
+                        projectiles.add(((Shooter) sprites[y][s]).fire());
                     }
                 }
             }

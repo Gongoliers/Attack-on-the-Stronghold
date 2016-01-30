@@ -5,18 +5,16 @@
  */
 package com.kylecorry.sprites;
 
-import com.kylecorry.attackstronghold.ImageLoader;
-
 /**
  *
  * @author kyle
  */
-public class BoulderProjectile extends Projectile {
+public interface Shooter {
 
-    public BoulderProjectile(int x, int y) {
-        super(x, y);
-        image = ImageLoader.getBoulder()[0];
-        damage = 30;
-    }
+    public abstract long getTimeout();
+
+    public abstract boolean canFire();
+
+    public abstract Projectile fire();
 
 }

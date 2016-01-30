@@ -11,12 +11,12 @@ import com.kylecorry.attackstronghold.ImageLoader;
  *
  * @author kyle
  */
-public class BoulderProjectile extends Projectile {
-
-    public BoulderProjectile(int x, int y) {
+public class Noodle extends Projectile{
+    
+    public Noodle(int x, int y) {
         super(x, y);
-        image = ImageLoader.getBoulder()[0];
-        damage = 30;
+        image = ImageLoader.getNoodle();
+        damage = 20;
     }
-
+    
 }

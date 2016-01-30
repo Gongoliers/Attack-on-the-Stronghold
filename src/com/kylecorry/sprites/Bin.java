@@ -7,6 +7,7 @@ package com.kylecorry.sprites;
 
 import com.kylecorry.attackstronghold.GamePanel;
 import com.kylecorry.attackstronghold.ImageLoader;
+import static com.kylecorry.sprites.Boulder.WIDTH;
 import java.awt.Graphics;
 import java.awt.Polygon;
 import java.awt.image.BufferedImage;
@@ -15,15 +16,18 @@ import java.awt.image.BufferedImage;
  *
  * @author kyle
  */
-public class Bin implements Sprite {
+public class Bin implements Sprite, Shooter {
 
     public static final int WIDTH = GamePanel.TILE_WIDTH;
     public static final int HEIGHT = GamePanel.TILE_HEIGHT;
     public static final int TOP_HEALTH = 300;
+
     private final int x;
     private final int y;
     private final BufferedImage image;
     private int health;
+    
+    private long lastFire = 0;
 
     public Bin(int x, int y) {
         image = ImageLoader.getBin();
@@ -31,9 +35,22 @@ public class Bin implements Sprite {
         this.x = x;
         this.y = y;
     }
-    
-    public GamePanel.SpriteType getType(){
+
+    public GamePanel.SpriteType getType() {
         return GamePanel.SpriteType.BIN;
+    }
+
+    public boolean canFire() {
+        long currentTime = System.currentTimeMillis();
+        boolean canFire = (currentTime - lastFire) >= getTimeout();
+        if (canFire) {
+            lastFire = currentTime;
+        }
+        return canFire;
+    }
+
+    public Projectile fire() {
+        return new Noodle(x + WIDTH / 2, y + HEIGHT/ 2 - 15);
     }
 
     public void collision(Sprite s) {
@@ -63,5 +80,10 @@ public class Bin implements Sprite {
 
     public void draw(Graphics g) {
         g.drawImage(image, x, y, null);
+    }
+
+    @Override
+    public long getTimeout() {
+        return 1250;
     }
 }
