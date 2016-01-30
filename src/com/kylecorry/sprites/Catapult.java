@@ -7,30 +7,40 @@ package com.kylecorry.sprites;
 
 import com.kylecorry.attackstronghold.ImageLoader;
 import com.kylecorry.spritetemplates.ProjectileSprite;
+import com.kylecorry.spritetemplates.ShooterSprite;
 import com.kylecorry.spritetemplates.Sprite;
-import com.kylecorry.spritetemplates.SpriteType;
 
 /**
  *
  * @author kyle
  */
-public class Noodle extends ProjectileSprite {
+public class Catapult extends ShooterSprite {
 
-    public Noodle(int x, int y) {
-        super(x, y, 10, 0, ImageLoader.getNoodle());
-    }
-
-    @Override
-    public int getDamage() {
-        return 20;
+    public Catapult(int x, int y) {
+        super(x, y, 200, ImageLoader.getBoulder());
     }
 
     @Override
     public void collision(Sprite s) {
-        if(s.getType() == SpriteType.ROBOT && isAlive()){
-            s.damage(getDamage());
-            damage(1);
-        }
+    }
+
+    @Override
+    public void update() {
+    }
+
+    @Override
+    public int getDamage() {
+        return 0;
+    }
+
+    @Override
+    public ProjectileSprite getProjectile() {
+        return new Boulder(getX(), getY());
+    }
+
+    @Override
+    public long getTimeout() {
+        return 1500;
     }
     
 }

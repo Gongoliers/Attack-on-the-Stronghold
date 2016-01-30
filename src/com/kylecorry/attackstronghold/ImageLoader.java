@@ -18,24 +18,26 @@ import javax.imageio.ImageIO;
  */
 public class ImageLoader {
 
-    public static BufferedImage getTote() {
+    public static BufferedImage[] getTote() {
+        BufferedImage[] images = new BufferedImage[1];
         try {
-            return ImageIO.read(ResourceLoader.load("tote.png"));
+            images[0] = ImageIO.read(ResourceLoader.load("tote.png"));
         } catch (IOException ex) {
             Logger.getLogger(ImageLoader.class.getName()).log(Level.SEVERE, null, ex);
             System.exit(1);
         }
-        return null;
+        return images;
     }
-    
-    public static BufferedImage getNoodle() {
+
+    public static BufferedImage[] getNoodle() {
+        BufferedImage[] images = new BufferedImage[1];
         try {
-            return ImageIO.read(ResourceLoader.load("noodle.png"));
+            images[0] = ImageIO.read(ResourceLoader.load("noodle.png"));
         } catch (IOException ex) {
             Logger.getLogger(ImageLoader.class.getName()).log(Level.SEVERE, null, ex);
             System.exit(1);
         }
-        return null;
+        return images;
     }
 
     public static BufferedImage[] getBoulder() {
@@ -52,8 +54,8 @@ public class ImageLoader {
         }
         return images;
     }
-    
-    public static BufferedImage[] getRobot() {
+
+    public static BufferedImage[] getBasicRobot() {
         BufferedImage[] images = new BufferedImage[3];
         try {
             images[0] = ImageIO.read(ResourceLoader.load("robot-1.png"));
@@ -65,14 +67,15 @@ public class ImageLoader {
         }
         return images;
     }
-    
-    public static BufferedImage getBin(){
+
+    public static BufferedImage[] getBin() {
+        BufferedImage[] images = new BufferedImage[1];
         try {
-            return ImageIO.read(ResourceLoader.load("bin.png"));
+            images[0] = ImageIO.read(ResourceLoader.load("bin.png"));
         } catch (IOException ex) {
             Logger.getLogger(ImageLoader.class.getName()).log(Level.SEVERE, null, ex);
             System.exit(1);
         }
-        return null;
+        return images;
     }
 }

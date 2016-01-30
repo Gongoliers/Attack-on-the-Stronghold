@@ -3,18 +3,15 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.kylecorry.sprites;
+package com.kylecorry.spritetemplates;
 
 /**
  *
  * @author kyle
  */
-public interface Shooter {
-
-    public abstract long getTimeout();
-
-    public abstract boolean canFire();
-
-    public abstract Projectile fire();
-
+public enum SpriteType {
+    NORMAL,
+    SHOOTER,
+    ROBOT,
+    PROJECTILE
 }

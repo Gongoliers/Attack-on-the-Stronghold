@@ -5,7 +5,11 @@
  */
 package com.kylecorry.attackstronghold;
 
-import com.kylecorry.sprites.*;
+import com.kylecorry.sprites.BasicRobot;
+import com.kylecorry.sprites.Bin;
+import com.kylecorry.sprites.Catapult;
+import com.kylecorry.sprites.Tote;
+import com.kylecorry.spritetemplates.*;
 import com.kylecorry.util.GameMath;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -32,11 +36,11 @@ public class GamePanel extends JPanel {
 
     private GameThread gt;
     private Mode mode;
-    private SpriteType currentSpriteType;
+    private CurrentSprite currentSpriteType;
 
     private Sprite[][] sprites;
     private ArrayList<Robot> robots, robotRemoveList;
-    private ArrayList<Projectile> projectiles, projectileRemoveList;
+    private ArrayList<ProjectileSprite> projectiles, projectileRemoveList;
 
     private Random random;
 
@@ -46,12 +50,8 @@ public class GamePanel extends JPanel {
         PAUSED
     };
 
-    public static enum SpriteType {
-        BIN,
-        TOTE,
-        BOULDER,
-        ROBOT,
-        PROJECTILE
+    private static enum CurrentSprite {
+        BIN, TOTE, CATAPULT
     };
 
     public GamePanel() {
@@ -60,7 +60,7 @@ public class GamePanel extends JPanel {
         setBorder(BorderFactory.createLineBorder(Color.BLACK));
         mode = Mode.HOME;
         sprites = new Sprite[HEIGHT / TILE_HEIGHT][WIDTH / TILE_WIDTH];
-        currentSpriteType = SpriteType.TOTE;
+        currentSpriteType = CurrentSprite.BIN;
         robots = new ArrayList<>();
         projectiles = new ArrayList<>();
         projectileRemoveList = new ArrayList<>();
@@ -83,8 +83,8 @@ public class GamePanel extends JPanel {
                             case BIN:
                                 sprites[row][col] = new Bin(x, y);
                                 break;
-                            case BOULDER:
-                                sprites[row][col] = new Boulder(x, y);
+                            case CATAPULT:
+                                sprites[row][col] = new Catapult(x, y);
                                 break;
                         }
                     }
@@ -121,13 +121,13 @@ public class GamePanel extends JPanel {
             public void keyPressed(KeyEvent ke) {
                 switch (ke.getKeyCode()) {
                     case 49:
-                        currentSpriteType = SpriteType.TOTE;
+                        currentSpriteType = CurrentSprite.TOTE;
                         break;
                     case 50:
-                        currentSpriteType = SpriteType.BIN;
+                        currentSpriteType = CurrentSprite.BIN;
                         break;
                     case 51:
-                        currentSpriteType = SpriteType.BOULDER;
+                        currentSpriteType = CurrentSprite.CATAPULT;
                         break;
 
                 }
@@ -163,7 +163,7 @@ public class GamePanel extends JPanel {
             g.drawLine(0, i * TILE_HEIGHT, WIDTH, i * TILE_HEIGHT);
         }
         if (random.nextInt(100) == 1) {
-            robots.add(new Robot(WIDTH, random.nextInt(HEIGHT / TILE_HEIGHT) * TILE_HEIGHT));
+            robots.add(new BasicRobot(WIDTH, random.nextInt(HEIGHT / TILE_HEIGHT) * TILE_HEIGHT));
         }
         for (int row = 0; row < sprites.length; row++) {
             for (int col = 0; col < sprites[row].length; col++) {
@@ -188,28 +188,33 @@ public class GamePanel extends JPanel {
                 break;
             }
             robot.draw(g);
-            int x = GameMath.toGrid(robot.getX(), TILE_WIDTH) / TILE_WIDTH;
-            int y = GameMath.toGrid(robot.getY(), TILE_HEIGHT) / TILE_WIDTH;
-            if (x >= 0 && sprites[y][x] != null) {
-                sprites[y][x].collision(robot);
-                robot.stop();
-            } else {
-                robot.move();
+            int y = robot.getRow(TILE_HEIGHT);
+            boolean hit = false;
+            for (int s = 0; s < sprites[y].length; s++) {
+                if (sprites[y][s] != null && sprites[y][s].isColliding(robot.getRect())) {
+                    sprites[y][s].collision(robot);
+                    robot.collision(sprites[y][s]);
+                    robot.stopMoving();
+                    hit = true;
+                    break;
+                }
             }
-            for (int s = 0; s < x; s++) {
-                if (sprites[y][s] != null && (sprites[y][s].getType() == SpriteType.BOULDER || sprites[y][s].getType() == SpriteType.BIN)) {
-                    if (((Shooter) sprites[y][s]).canFire()) {
-                        projectiles.add(((Shooter) sprites[y][s]).fire());
+            if(!hit){
+                robot.continueMoving();
+            }
+            for (int s = 0; s < Math.min(robot.getColumn(TILE_WIDTH) + 1, sprites.length); s++) {
+                if (sprites[y][s] != null && sprites[y][s].getType() == SpriteType.SHOOTER) {
+                    if (((ShooterSprite) sprites[y][s]).canFire()) {
+                        projectiles.add(((ShooterSprite) sprites[y][s]).fire());
                     }
                 }
             }
         }
         for (int i = 0; i < projectiles.size(); i++) {
-            Projectile projectile = projectiles.get(i);
+            ProjectileSprite projectile = projectiles.get(i);
             projectile.update();
             if (!projectile.isAlive()) {
                 projectileRemoveList.add(projectile);
-                break;
             }
             projectile.draw(g);
             int x = GameMath.toGrid(projectile.getX(), TILE_WIDTH) / TILE_WIDTH;
@@ -220,7 +225,7 @@ public class GamePanel extends JPanel {
                 }
             }
         }
-        for (Projectile p : projectileRemoveList) {
+        for (ProjectileSprite p : projectileRemoveList) {
             projectiles.remove(p);
         }
         projectileRemoveList.clear();
