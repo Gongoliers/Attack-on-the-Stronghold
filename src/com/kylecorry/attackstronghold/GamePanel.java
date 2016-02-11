@@ -34,6 +34,8 @@ public class GamePanel extends JPanel {
     public static final int TILE_WIDTH = WIDTH / 10;
     public static final int TILE_HEIGHT = HEIGHT / 5;
 
+    public static int houseHealth = 50;
+
     private GameThread gt;
     private Mode mode;
     private CurrentSprite currentSpriteType;
@@ -45,12 +47,14 @@ public class GamePanel extends JPanel {
     private Random random;
 
     private static enum Mode {
+
         HOME,
         PLAYING,
         PAUSED
     };
 
     private static enum CurrentSprite {
+
         BIN, TOTE, CATAPULT
     };
 
@@ -58,7 +62,7 @@ public class GamePanel extends JPanel {
         setFocusable(true);
         requestFocusInWindow(false);
         setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        mode = Mode.HOME;
+        mode = Mode.PLAYING;
         sprites = new Sprite[HEIGHT / TILE_HEIGHT][WIDTH / TILE_WIDTH];
         currentSpriteType = CurrentSprite.BIN;
         robots = new ArrayList<>();
@@ -155,85 +159,104 @@ public class GamePanel extends JPanel {
     protected void paintComponent(Graphics g) {
         g.setColor(new Color(24, 107, 16));
         g.fillRect(0, 0, WIDTH, HEIGHT);
-        g.setColor(Color.WHITE);
-        for (int i = 0; i < WIDTH / TILE_WIDTH; i++) {
-            g.drawLine(i * TILE_WIDTH, 0, i * TILE_WIDTH, HEIGHT);
-        }
-        for (int i = 0; i < HEIGHT / TILE_HEIGHT; i++) {
-            g.drawLine(0, i * TILE_HEIGHT, WIDTH, i * TILE_HEIGHT);
-        }
-        if (random.nextInt(100) == 1) {
-            robots.add(new BasicRobot(WIDTH, random.nextInt(HEIGHT / TILE_HEIGHT) * TILE_HEIGHT));
-        }
-        for (int row = 0; row < sprites.length; row++) {
-            for (int col = 0; col < sprites[row].length; col++) {
-                if (sprites[row][col] != null) {
-                    sprites[row][col].update();
-                    sprites[row][col].draw(g);
+        switch (mode) {
+            case PLAYING:
+                g.setColor(Color.WHITE);
+                for (int i = 0; i < WIDTH / TILE_WIDTH; i++) {
+                    g.drawLine(i * TILE_WIDTH, 0, i * TILE_WIDTH, HEIGHT);
                 }
-            }
-        }
-        for (int row = 0; row < sprites.length; row++) {
-            for (int col = 0; col < sprites[row].length; col++) {
-                if (sprites[row][col] != null && !sprites[row][col].isAlive()) {
-                    sprites[row][col] = null;
+                for (int i = 0; i < HEIGHT / TILE_HEIGHT; i++) {
+                    g.drawLine(0, i * TILE_HEIGHT, WIDTH, i * TILE_HEIGHT);
                 }
-            }
-        }
-        for (int i = 0; i < robots.size(); i++) {
-            Robot robot = robots.get(i);
-            robot.update();
-            if (!robot.isAlive()) {
-                robotRemoveList.add(robot);
-                break;
-            }
-            robot.draw(g);
-            int y = robot.getRow(TILE_HEIGHT);
-            boolean hit = false;
-            for (int s = 0; s < sprites[y].length; s++) {
-                if (sprites[y][s] != null && sprites[y][s].isColliding(robot.getRect())) {
-                    sprites[y][s].collision(robot);
-                    robot.collision(sprites[y][s]);
-                    robot.stopMoving();
-                    hit = true;
-                    break;
+                if (random.nextInt(100) == 1) {
+                    robots.add(new BasicRobot(WIDTH, random.nextInt(HEIGHT / TILE_HEIGHT) * TILE_HEIGHT));
                 }
-            }
-            if(!hit){
-                robot.continueMoving();
-            }
-            for (int s = 0; s < Math.min(robot.getColumn(TILE_WIDTH) + 1, sprites.length); s++) {
-                if (sprites[y][s] != null && sprites[y][s].getType() == SpriteType.SHOOTER) {
-                    if (((ShooterSprite) sprites[y][s]).canFire()) {
-                        projectiles.add(((ShooterSprite) sprites[y][s]).fire());
+                for (int row = 0; row < sprites.length; row++) {
+                    for (int col = 0; col < sprites[row].length; col++) {
+                        if (sprites[row][col] != null) {
+                            sprites[row][col].update();
+                            sprites[row][col].draw(g);
+                        }
                     }
                 }
-            }
-        }
-        for (int i = 0; i < projectiles.size(); i++) {
-            ProjectileSprite projectile = projectiles.get(i);
-            projectile.update();
-            if (!projectile.isAlive()) {
-                projectileRemoveList.add(projectile);
-            }
-            projectile.draw(g);
-            int x = GameMath.toGrid(projectile.getX(), TILE_WIDTH) / TILE_WIDTH;
-            int y = GameMath.toGrid(projectile.getY(), TILE_HEIGHT) / TILE_WIDTH;
-            for (Robot r : robots) {
-                if (GameMath.toGrid(r.getX(), TILE_WIDTH) / TILE_WIDTH == x && GameMath.toGrid(r.getY(), TILE_HEIGHT) / TILE_WIDTH == y) {
-                    projectile.collision(r);
+                for (int row = 0; row < sprites.length; row++) {
+                    for (int col = 0; col < sprites[row].length; col++) {
+                        if (sprites[row][col] != null && !sprites[row][col].isAlive()) {
+                            sprites[row][col] = null;
+                        }
+                    }
                 }
-            }
-        }
-        for (ProjectileSprite p : projectileRemoveList) {
-            projectiles.remove(p);
-        }
-        projectileRemoveList.clear();
+                for (int i = 0; i < robots.size(); i++) {
+                    Robot robot = robots.get(i);
+                    robot.update();
+                    if (robot.getX() < 0) {
+                        houseHealth -= robot.getDamage();
+                        robotRemoveList.add(robot);
+                        break;
+                    }
+                    if (!robot.isAlive()) {
+                        robotRemoveList.add(robot);
+                        break;
+                    }
+                    robot.draw(g);
+                    int y = robot.getRow(TILE_HEIGHT);
+                    boolean hit = false;
+                    for (int s = 0; s < sprites[y].length; s++) {
+                        if (sprites[y][s] != null && sprites[y][s].isColliding(robot.getRect())) {
+                            sprites[y][s].collision(robot);
+                            robot.collision(sprites[y][s]);
+                            robot.stopMoving();
+                            hit = true;
+                            break;
+                        }
+                    }
+                    if (!hit) {
+                        robot.continueMoving();
+                    }
+                    for (int s = 0; s < Math.min(robot.getColumn(TILE_WIDTH) + 1, sprites.length); s++) {
+                        if (sprites[y][s] != null && sprites[y][s].getType() == SpriteType.SHOOTER) {
+                            if (((ShooterSprite) sprites[y][s]).canFire()) {
+                                projectiles.add(((ShooterSprite) sprites[y][s]).fire());
+                            }
+                        }
+                    }
+                }
+                for (int i = 0; i < projectiles.size(); i++) {
+                    ProjectileSprite projectile = projectiles.get(i);
+                    projectile.update();
+                    if (!projectile.isAlive()) {
+                        projectileRemoveList.add(projectile);
+                    }
+                    projectile.draw(g);
+                    int x = GameMath.toGrid(projectile.getX(), TILE_WIDTH) / TILE_WIDTH;
+                    int y = GameMath.toGrid(projectile.getY(), TILE_HEIGHT) / TILE_WIDTH;
+                    for (Robot r : robots) {
+                        if (GameMath.toGrid(r.getX(), TILE_WIDTH) / TILE_WIDTH == x && GameMath.toGrid(r.getY(), TILE_HEIGHT) / TILE_WIDTH == y) {
+                            projectile.collision(r);
+                        }
+                    }
+                }
+                for (ProjectileSprite p : projectileRemoveList) {
+                    projectiles.remove(p);
+                }
+                projectileRemoveList.clear();
 
-        for (Robot r : robotRemoveList) {
-            robots.remove(r);
+                for (Robot r : robotRemoveList) {
+                    robots.remove(r);
+                }
+                robotRemoveList.clear();
+                
+                if(houseHealth <= 0){
+                    mode = Mode.HOME;
+                } else {
+                    g.drawString("Lives: " + (houseHealth / 5), 10, 20);
+                }
+                break;
+            case HOME:
+                g.setColor(Color.WHITE);
+                g.drawString("Game Over", WIDTH / 2 - 20, HEIGHT / 2);
+                break;
         }
-        robotRemoveList.clear();
     }
 
 }
