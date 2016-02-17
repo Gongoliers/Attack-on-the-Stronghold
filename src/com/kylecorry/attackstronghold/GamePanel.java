@@ -58,8 +58,8 @@ public class GamePanel extends JPanel {
 
         BIN, TOTE, CATAPULT
     };
-    
-    public void setCurrentSpriteType(CurrentSprite sprite){
+
+    public void setCurrentSpriteType(CurrentSprite sprite) {
         currentSpriteType = sprite;
     }
 
@@ -133,7 +133,14 @@ public class GamePanel extends JPanel {
                     mode = Mode.PLAYING;
                 }
                 if (mode == Mode.HOME) {
-                    mode = Mode.PLAYING;
+                    mode = Mode.START;
+                    houseHealth = 50;
+                    sprites = new Sprite[HEIGHT / TILE_HEIGHT][WIDTH / TILE_WIDTH];
+                    robots = new ArrayList<>();
+                    projectiles = new ArrayList<>();
+                    projectileRemoveList = new ArrayList<>();
+                    robotRemoveList = new ArrayList<>();
+                    random = new Random();
                 }
             }
 
@@ -197,11 +204,9 @@ public class GamePanel extends JPanel {
                     if (robot.getX() < 0) {
                         houseHealth -= robot.getDamage();
                         robotRemoveList.add(robot);
-                        break;
                     }
                     if (!robot.isAlive()) {
                         robotRemoveList.add(robot);
-                        break;
                     }
                     robot.draw(g);
                     int y = robot.getRow(TILE_HEIGHT);

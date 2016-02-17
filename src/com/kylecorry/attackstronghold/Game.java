@@ -5,6 +5,7 @@
  */
 package com.kylecorry.attackstronghold;
 
+import java.awt.FlowLayout;
 import javax.swing.JFrame;
 
 /**
@@ -21,19 +22,13 @@ public class Game {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setResizable(false);
         GamePanel gp = new GamePanel();
+        GamePieceSelector gp2 = new GamePieceSelector(gp);
+        frame.setLayout(new FlowLayout());
         frame.add(gp);
+        frame.add(gp2);
         frame.setVisible(true);
         frame.pack();
         frame.setLocationRelativeTo(null);
-        
-        JFrame frame2 = new JFrame("Game Pieces");
-        frame2.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame2.setResizable(false);
-        GamePieceSelector gp2 = new GamePieceSelector(gp);
-        frame2.add(gp2);
-        frame2.setVisible(true);
-        frame2.pack();
-        frame2.setLocationRelativeTo(null);
     }
     
 }
