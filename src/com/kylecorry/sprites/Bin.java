@@ -18,7 +18,7 @@ import com.kylecorry.spritetemplates.SpriteType;
 public class Bin extends ShooterSprite {
 
     public Bin(int x, int y) {
-        super(x, y, 200, ImageLoader.getBin());
+        super(x, y, 450, ImageLoader.getBin());
     }
 
     @Override

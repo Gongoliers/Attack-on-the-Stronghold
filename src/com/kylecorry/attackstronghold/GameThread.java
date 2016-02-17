@@ -5,6 +5,8 @@
  */
 package com.kylecorry.attackstronghold;
 
+import javax.swing.JPanel;
+
 
 /**
  *
@@ -12,14 +14,14 @@ package com.kylecorry.attackstronghold;
  */
 public class GameThread extends Thread{
     public static final int FPS = 30;
-    private GamePanel gp;
+    private JPanel gp;
     private boolean running;
     
     public void pause(){
         running = false;
     }
     
-    public GameThread(GamePanel gp){
+    public GameThread(JPanel gp){
         this.gp = gp;
         running = true;
     }

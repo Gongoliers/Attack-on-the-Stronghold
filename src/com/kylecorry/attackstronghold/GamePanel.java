@@ -50,19 +50,24 @@ public class GamePanel extends JPanel {
 
         HOME,
         PLAYING,
-        PAUSED
+        PAUSED,
+        START
     };
 
-    private static enum CurrentSprite {
+    public static enum CurrentSprite {
 
         BIN, TOTE, CATAPULT
     };
+    
+    public void setCurrentSpriteType(CurrentSprite sprite){
+        currentSpriteType = sprite;
+    }
 
     public GamePanel() {
         setFocusable(true);
         requestFocusInWindow(false);
         setBorder(BorderFactory.createLineBorder(Color.BLACK));
-        mode = Mode.PLAYING;
+        mode = Mode.START;
         sprites = new Sprite[HEIGHT / TILE_HEIGHT][WIDTH / TILE_WIDTH];
         currentSpriteType = CurrentSprite.BIN;
         robots = new ArrayList<>();
@@ -73,27 +78,28 @@ public class GamePanel extends JPanel {
         addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent me) {
-
-                int x = GameMath.toGrid(me.getX(), TILE_WIDTH);
-                int y = GameMath.toGrid(me.getY(), TILE_HEIGHT);
-                int col = x / TILE_WIDTH;
-                int row = y / TILE_HEIGHT;
-                if (me.getButton() == MouseEvent.BUTTON1) {
-                    if (sprites[row][col] == null) {
-                        switch (currentSpriteType) {
-                            case TOTE:
-                                sprites[row][col] = new Tote(x, y);
-                                break;
-                            case BIN:
-                                sprites[row][col] = new Bin(x, y);
-                                break;
-                            case CATAPULT:
-                                sprites[row][col] = new Catapult(x, y);
-                                break;
+                if (mode == Mode.PLAYING) {
+                    int x = GameMath.toGrid(me.getX(), TILE_WIDTH);
+                    int y = GameMath.toGrid(me.getY(), TILE_HEIGHT);
+                    int col = x / TILE_WIDTH;
+                    int row = y / TILE_HEIGHT;
+                    if (me.getButton() == MouseEvent.BUTTON1) {
+                        if (sprites[row][col] == null) {
+                            switch (currentSpriteType) {
+                                case TOTE:
+                                    sprites[row][col] = new Tote(x, y);
+                                    break;
+                                case BIN:
+                                    sprites[row][col] = new Bin(x, y);
+                                    break;
+                                case CATAPULT:
+                                    sprites[row][col] = new Catapult(x, y);
+                                    break;
+                            }
                         }
+                    } else if (me.getButton() == MouseEvent.BUTTON3) {
+                        sprites[row][col] = null;
                     }
-                } else if (me.getButton() == MouseEvent.BUTTON3) {
-                    sprites[row][col] = null;
                 }
             }
 
@@ -123,17 +129,11 @@ public class GamePanel extends JPanel {
 
             @Override
             public void keyPressed(KeyEvent ke) {
-                switch (ke.getKeyCode()) {
-                    case 49:
-                        currentSpriteType = CurrentSprite.TOTE;
-                        break;
-                    case 50:
-                        currentSpriteType = CurrentSprite.BIN;
-                        break;
-                    case 51:
-                        currentSpriteType = CurrentSprite.CATAPULT;
-                        break;
-
+                if (mode == Mode.START) {
+                    mode = Mode.PLAYING;
+                }
+                if (mode == Mode.HOME) {
+                    mode = Mode.PLAYING;
                 }
             }
 
@@ -160,6 +160,11 @@ public class GamePanel extends JPanel {
         g.setColor(new Color(24, 107, 16));
         g.fillRect(0, 0, WIDTH, HEIGHT);
         switch (mode) {
+            case START:
+                g.setColor(Color.WHITE);
+                g.drawString("Attack on the Stronghold", WIDTH / 2 - 20, HEIGHT / 2 - 30);
+                g.drawString("Press any key to continue", WIDTH / 2 - 20, HEIGHT / 2 + 30);
+                break;
             case PLAYING:
                 g.setColor(Color.WHITE);
                 for (int i = 0; i < WIDTH / TILE_WIDTH; i++) {
@@ -168,7 +173,7 @@ public class GamePanel extends JPanel {
                 for (int i = 0; i < HEIGHT / TILE_HEIGHT; i++) {
                     g.drawLine(0, i * TILE_HEIGHT, WIDTH, i * TILE_HEIGHT);
                 }
-                if (random.nextInt(100) == 1) {
+                if (random.nextInt(100) <= 2) {
                     robots.add(new BasicRobot(WIDTH, random.nextInt(HEIGHT / TILE_HEIGHT) * TILE_HEIGHT));
                 }
                 for (int row = 0; row < sprites.length; row++) {
@@ -245,8 +250,8 @@ public class GamePanel extends JPanel {
                     robots.remove(r);
                 }
                 robotRemoveList.clear();
-                
-                if(houseHealth <= 0){
+
+                if (houseHealth <= 0) {
                     mode = Mode.HOME;
                 } else {
                     g.drawString("Lives: " + (houseHealth / 5), 10, 20);

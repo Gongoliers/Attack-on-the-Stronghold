@@ -9,6 +9,7 @@ import com.kylecorry.attackstronghold.ImageLoader;
 import com.kylecorry.spritetemplates.ProjectileSprite;
 import com.kylecorry.spritetemplates.ShooterSprite;
 import com.kylecorry.spritetemplates.Sprite;
+import com.kylecorry.spritetemplates.SpriteType;
 
 /**
  *
@@ -17,11 +18,14 @@ import com.kylecorry.spritetemplates.Sprite;
 public class Catapult extends ShooterSprite {
 
     public Catapult(int x, int y) {
-        super(x, y, 200, ImageLoader.getBoulder());
+        super(x, y, 500, ImageLoader.getBoulder());
     }
 
     @Override
     public void collision(Sprite s) {
+        if(s.getType() == SpriteType.ROBOT){
+            damage(s.getDamage());
+        }
     }
 
     @Override

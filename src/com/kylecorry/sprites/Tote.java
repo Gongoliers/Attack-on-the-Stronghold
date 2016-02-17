@@ -7,6 +7,7 @@ package com.kylecorry.sprites;
 
 import com.kylecorry.attackstronghold.ImageLoader;
 import com.kylecorry.spritetemplates.Sprite;
+import com.kylecorry.spritetemplates.SpriteType;
 
 /**
  *
@@ -15,7 +16,7 @@ import com.kylecorry.spritetemplates.Sprite;
 public class Tote extends Sprite {
 
     public Tote(int x, int y) {
-        super(x, y, 500, ImageLoader.getTote());
+        super(x, y, 1000, ImageLoader.getTote());
     }
 
     @Override
@@ -25,6 +26,9 @@ public class Tote extends Sprite {
 
     @Override
     public void collision(Sprite s) {
+        if(s.getType() == SpriteType.ROBOT){
+            damage(s.getDamage());
+        }
     }
 
     @Override
