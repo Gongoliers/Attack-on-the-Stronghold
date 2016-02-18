@@ -17,11 +17,6 @@ public abstract class Robot extends Sprite {
 
     private final int originalVelocityX, originalVelocityY;
 
-    @Override
-    public SpriteType getType() {
-        return SpriteType.ROBOT;
-    }
-
     public Robot(int x, int y, int velX, int velY, int maxHealth, BufferedImage[] images) {
         super(x, y, maxHealth, images);
         setVelocity(velX, velY);

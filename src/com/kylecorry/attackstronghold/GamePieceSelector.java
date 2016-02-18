@@ -143,6 +143,10 @@ public class GamePieceSelector extends JPanel {
     public Dimension getPreferredSize() {
         return new Dimension(WIDTH, HEIGHT);
     }
+    
+    public CurrentSprite getCurrentSprite(){
+        return currentSpriteType;
+    }
 
     @Override
     protected void paintComponent(Graphics g) {

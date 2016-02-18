@@ -33,11 +33,6 @@ public abstract class ProjectileSprite extends Sprite {
     }
 
     @Override
-    public SpriteType getType() {
-        return SpriteType.PROJECTILE;
-    }
-
-    @Override
     public abstract int getDamage();
 
     @Override

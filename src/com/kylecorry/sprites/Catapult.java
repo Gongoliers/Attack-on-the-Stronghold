@@ -7,9 +7,9 @@ package com.kylecorry.sprites;
 
 import com.kylecorry.attackstronghold.ImageLoader;
 import com.kylecorry.spritetemplates.ProjectileSprite;
+import com.kylecorry.spritetemplates.Robot;
 import com.kylecorry.spritetemplates.ShooterSprite;
 import com.kylecorry.spritetemplates.Sprite;
-import com.kylecorry.spritetemplates.SpriteType;
 
 /**
  *
@@ -23,7 +23,7 @@ public class Catapult extends ShooterSprite {
 
     @Override
     public void collision(Sprite s) {
-        if(s.getType() == SpriteType.ROBOT){
+        if(s instanceof Robot){
             damage(s.getDamage());
         }
     }

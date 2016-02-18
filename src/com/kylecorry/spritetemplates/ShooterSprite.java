@@ -35,11 +35,6 @@ public abstract class ShooterSprite extends Sprite {
         return (currentTime - lastFire) >= getTimeout();
     }
 
-    @Override
-    public SpriteType getType() {
-        return SpriteType.SHOOTER;
-    }
-
     public ProjectileSprite fire(){
          if (canFire()) {
             lastFire = System.currentTimeMillis();

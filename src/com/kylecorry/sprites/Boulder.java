@@ -8,8 +8,8 @@ package com.kylecorry.sprites;
 import com.kylecorry.attackstronghold.GamePanel;
 import com.kylecorry.attackstronghold.ImageLoader;
 import com.kylecorry.spritetemplates.ProjectileSprite;
+import com.kylecorry.spritetemplates.Robot;
 import com.kylecorry.spritetemplates.Sprite;
-import com.kylecorry.spritetemplates.SpriteType;
 
 /**
  *
@@ -28,7 +28,7 @@ public class Boulder extends ProjectileSprite {
 
     @Override
     public void collision(Sprite s) {
-        if(s.getType() == SpriteType.ROBOT && isAlive()){
+        if(s instanceof Robot && isAlive()){
             s.damage(getDamage());
             damage(1);
         }

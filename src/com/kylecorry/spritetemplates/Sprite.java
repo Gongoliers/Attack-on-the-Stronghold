@@ -85,10 +85,6 @@ public abstract class Sprite {
 
     public abstract void collision(Sprite s);
 
-    public SpriteType getType() {
-        return SpriteType.NORMAL;
-    }
-
     public int getX() {
         return x;
     }

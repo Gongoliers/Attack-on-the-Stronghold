@@ -31,8 +31,10 @@ public class GamePanel extends JPanel {
 
     public static final int WIDTH = 850;
     public static final int HEIGHT = 425;
-    public static final int TILE_WIDTH = WIDTH / 10;
-    public static final int TILE_HEIGHT = HEIGHT / 5;
+    public static final int NUM_ROWS = 5;
+    public static final int NUM_COLS = 10;
+    public static final int TILE_WIDTH = WIDTH / NUM_COLS;
+    public static final int TILE_HEIGHT = HEIGHT / NUM_ROWS;
 
     public static int houseHealth = 50;
 
@@ -41,18 +43,16 @@ public class GamePanel extends JPanel {
     private CurrentSprite currentSpriteType;
 
     private SpriteMap spriteMap;
+    private RobotSpawner robotSpawner;
 
-//    private Sprite[][] sprites;
     private ArrayList<Robot> robots, robotRemoveList;
     private ArrayList<ProjectileSprite> projectiles, projectileRemoveList;
 
     private Random random;
 
     private static enum Mode {
-
-        HOME,
+        END,
         PLAYING,
-        PAUSED,
         START
     };
 
@@ -70,8 +70,8 @@ public class GamePanel extends JPanel {
         requestFocusInWindow(false);
         setBorder(BorderFactory.createLineBorder(Color.BLACK));
         mode = Mode.START;
-//        sprites = new Sprite[HEIGHT / TILE_HEIGHT][WIDTH / TILE_WIDTH];
-        spriteMap = new SpriteMap(HEIGHT / TILE_HEIGHT, WIDTH / TILE_WIDTH);
+        spriteMap = new SpriteMap(NUM_ROWS, NUM_COLS);
+        robotSpawner = new RobotSpawner(NUM_ROWS, 2, WIDTH, TILE_HEIGHT);
         currentSpriteType = CurrentSprite.BIN;
         robots = new ArrayList<>();
         projectiles = new ArrayList<>();
@@ -135,7 +135,7 @@ public class GamePanel extends JPanel {
                 if (mode == Mode.START) {
                     mode = Mode.PLAYING;
                 }
-                if (mode == Mode.HOME) {
+                if (mode == Mode.END) {
                     mode = Mode.START;
                     houseHealth = 50;
                     spriteMap = new SpriteMap(HEIGHT / TILE_HEIGHT, WIDTH / TILE_WIDTH);
@@ -186,6 +186,7 @@ public class GamePanel extends JPanel {
                 if (random.nextInt(100) <= 2) {
                     robots.add(new BasicRobot(WIDTH, random.nextInt(HEIGHT / TILE_HEIGHT) * TILE_HEIGHT));
                 }
+//                robotSpawner.generateRandomRobot();
                 for (int row = 0; row < spriteMap.getNumberOfRows(); row++) {
                     for (int col = 0; col < spriteMap.getNumberOfCols(); col++) {
                         if (spriteMap.isOccupied(row, col)) {
@@ -227,7 +228,7 @@ public class GamePanel extends JPanel {
                         robot.continueMoving();
                     }
                     for (int s = 0; s < Math.min(robot.getColumn(TILE_WIDTH) + 1, spriteMap.getNumberOfRows()); s++) {
-                        if (spriteMap.isOccupied(y, s) && spriteMap.getSprite(y, s).getType() == SpriteType.SHOOTER) {
+                        if (spriteMap.isOccupied(y, s) && spriteMap.getSprite(y, s) instanceof ShooterSprite) {
                             if (((ShooterSprite) spriteMap.getSprite(y, s)).canFire()) {
                                 projectiles.add(((ShooterSprite) spriteMap.getSprite(y, s)).fire());
                             }
@@ -260,12 +261,12 @@ public class GamePanel extends JPanel {
                 robotRemoveList.clear();
 
                 if (houseHealth <= 0) {
-                    mode = Mode.HOME;
+                    mode = Mode.END;
                 } else {
                     g.drawString("Lives: " + (houseHealth / 5), 10, 20);
                 }
                 break;
-            case HOME:
+            case END:
                 g.setColor(Color.WHITE);
                 g.drawString("Game Over", WIDTH / 2 - 20, HEIGHT / 2);
                 break;
