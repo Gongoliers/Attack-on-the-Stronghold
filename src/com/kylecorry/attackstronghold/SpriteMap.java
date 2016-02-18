@@ -13,9 +13,13 @@ import com.kylecorry.spritetemplates.Sprite;
  */
 public class SpriteMap {
     private final Sprite[][] sprites;
+    private final int rows;
+    private final int cols;
     
     public SpriteMap(int rows, int cols){
         sprites = new Sprite[rows][cols];
+        this.rows = rows;
+        this.cols = cols;
     }
     
     public Sprite getSprite(int row, int col){
@@ -32,5 +36,13 @@ public class SpriteMap {
     
     public boolean isOccupied(int row, int col){
         return sprites[row][col] != null;
+    }
+    
+    public int getNumberOfRows(){
+        return rows;
+    }
+    
+    public int getNumberOfCols(){
+        return cols;
     }
 }

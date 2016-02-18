@@ -40,7 +40,9 @@ public class GamePanel extends JPanel {
     private Mode mode;
     private CurrentSprite currentSpriteType;
 
-    private Sprite[][] sprites;
+    private SpriteMap spriteMap;
+
+//    private Sprite[][] sprites;
     private ArrayList<Robot> robots, robotRemoveList;
     private ArrayList<ProjectileSprite> projectiles, projectileRemoveList;
 
@@ -68,7 +70,8 @@ public class GamePanel extends JPanel {
         requestFocusInWindow(false);
         setBorder(BorderFactory.createLineBorder(Color.BLACK));
         mode = Mode.START;
-        sprites = new Sprite[HEIGHT / TILE_HEIGHT][WIDTH / TILE_WIDTH];
+//        sprites = new Sprite[HEIGHT / TILE_HEIGHT][WIDTH / TILE_WIDTH];
+        spriteMap = new SpriteMap(HEIGHT / TILE_HEIGHT, WIDTH / TILE_WIDTH);
         currentSpriteType = CurrentSprite.BIN;
         robots = new ArrayList<>();
         projectiles = new ArrayList<>();
@@ -84,21 +87,21 @@ public class GamePanel extends JPanel {
                     int col = x / TILE_WIDTH;
                     int row = y / TILE_HEIGHT;
                     if (me.getButton() == MouseEvent.BUTTON1) {
-                        if (sprites[row][col] == null) {
+                        if (!spriteMap.isOccupied(row, col)) {
                             switch (currentSpriteType) {
                                 case TOTE:
-                                    sprites[row][col] = new Tote(x, y);
+                                    spriteMap.putSprite(row, col, new Tote(x, y));
                                     break;
                                 case BIN:
-                                    sprites[row][col] = new Bin(x, y);
+                                    spriteMap.putSprite(row, col, new Bin(x, y));
                                     break;
                                 case CATAPULT:
-                                    sprites[row][col] = new Catapult(x, y);
+                                    spriteMap.putSprite(row, col, new Catapult(x, y));
                                     break;
                             }
                         }
                     } else if (me.getButton() == MouseEvent.BUTTON3) {
-                        sprites[row][col] = null;
+                        spriteMap.removeSprite(row, col);
                     }
                 }
             }
@@ -135,7 +138,7 @@ public class GamePanel extends JPanel {
                 if (mode == Mode.HOME) {
                     mode = Mode.START;
                     houseHealth = 50;
-                    sprites = new Sprite[HEIGHT / TILE_HEIGHT][WIDTH / TILE_WIDTH];
+                    spriteMap = new SpriteMap(HEIGHT / TILE_HEIGHT, WIDTH / TILE_WIDTH);
                     robots = new ArrayList<>();
                     projectiles = new ArrayList<>();
                     projectileRemoveList = new ArrayList<>();
@@ -183,18 +186,18 @@ public class GamePanel extends JPanel {
                 if (random.nextInt(100) <= 2) {
                     robots.add(new BasicRobot(WIDTH, random.nextInt(HEIGHT / TILE_HEIGHT) * TILE_HEIGHT));
                 }
-                for (int row = 0; row < sprites.length; row++) {
-                    for (int col = 0; col < sprites[row].length; col++) {
-                        if (sprites[row][col] != null) {
-                            sprites[row][col].update();
-                            sprites[row][col].draw(g);
+                for (int row = 0; row < spriteMap.getNumberOfRows(); row++) {
+                    for (int col = 0; col < spriteMap.getNumberOfCols(); col++) {
+                        if (spriteMap.isOccupied(row, col)) {
+                            spriteMap.getSprite(row, col).update();
+                            spriteMap.getSprite(row, col).draw(g);
                         }
                     }
                 }
-                for (int row = 0; row < sprites.length; row++) {
-                    for (int col = 0; col < sprites[row].length; col++) {
-                        if (sprites[row][col] != null && !sprites[row][col].isAlive()) {
-                            sprites[row][col] = null;
+                for (int row = 0; row < spriteMap.getNumberOfRows(); row++) {
+                    for (int col = 0; col < spriteMap.getNumberOfCols(); col++) {
+                        if (spriteMap.isOccupied(row, col) && !spriteMap.getSprite(row, col).isAlive()) {
+                            spriteMap.removeSprite(row, col);
                         }
                     }
                 }
@@ -211,10 +214,10 @@ public class GamePanel extends JPanel {
                     robot.draw(g);
                     int y = robot.getRow(TILE_HEIGHT);
                     boolean hit = false;
-                    for (int s = 0; s < sprites[y].length; s++) {
-                        if (sprites[y][s] != null && sprites[y][s].isColliding(robot.getRect())) {
-                            sprites[y][s].collision(robot);
-                            robot.collision(sprites[y][s]);
+                    for (int s = 0; s < spriteMap.getNumberOfCols(); s++) {
+                        if (spriteMap.isOccupied(y, s) && spriteMap.getSprite(y, s).isColliding(robot.getRect())) {
+                            spriteMap.getSprite(y, s).collision(robot);
+                            robot.collision(spriteMap.getSprite(y, s));
                             robot.stopMoving();
                             hit = true;
                             break;
@@ -223,10 +226,10 @@ public class GamePanel extends JPanel {
                     if (!hit) {
                         robot.continueMoving();
                     }
-                    for (int s = 0; s < Math.min(robot.getColumn(TILE_WIDTH) + 1, sprites.length); s++) {
-                        if (sprites[y][s] != null && sprites[y][s].getType() == SpriteType.SHOOTER) {
-                            if (((ShooterSprite) sprites[y][s]).canFire()) {
-                                projectiles.add(((ShooterSprite) sprites[y][s]).fire());
+                    for (int s = 0; s < Math.min(robot.getColumn(TILE_WIDTH) + 1, spriteMap.getNumberOfRows()); s++) {
+                        if (spriteMap.isOccupied(y, s) && spriteMap.getSprite(y, s).getType() == SpriteType.SHOOTER) {
+                            if (((ShooterSprite) spriteMap.getSprite(y, s)).canFire()) {
+                                projectiles.add(((ShooterSprite) spriteMap.getSprite(y, s)).fire());
                             }
                         }
                     }
